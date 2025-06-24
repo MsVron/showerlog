@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { Header } from "@/components/ui/header"
 import { WaterButton } from "@/components/ui/water-button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 
@@ -166,9 +167,8 @@ export default function SignInPage() {
               <Label htmlFor="password" className="text-blue-700 font-medium">
                 Password
               </Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 value={formData.password}
                 onChange={handleInputChange("password")}
                 disabled={isLoading}

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Header } from "@/components/ui/header"
 import { WaterButton } from "@/components/ui/water-button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 
@@ -209,9 +210,8 @@ export default function SignUpPage() {
                   <Label htmlFor="password" className="text-blue-700 font-medium">
                     Password
                   </Label>
-                  <Input
+                  <PasswordInput
                     id="password"
-                    type="password"
                     value={formData.password}
                     onChange={handleInputChange("password")}
                     className={`mt-1 rounded-xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 ${
@@ -226,9 +226,8 @@ export default function SignUpPage() {
                   <Label htmlFor="confirmPassword" className="text-blue-700 font-medium">
                     Confirm Password
                   </Label>
-                  <Input
+                  <PasswordInput
                     id="confirmPassword"
-                    type="password"
                     value={formData.confirmPassword}
                     onChange={handleInputChange("confirmPassword")}
                     className={`mt-1 rounded-xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 ${
