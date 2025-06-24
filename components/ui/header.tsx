@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Github, LogOut, Settings, User } from "lucide-react"
+import { Github, LogIn, LogOut, Settings, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -94,6 +94,15 @@ export function Header() {
               </Button>
             </div>
           </div>
+        )}
+        
+        {!user && !isLoading && (
+          <Button variant="ghost" size="sm" asChild className="hover:bg-blue-100/50 transition-colors">
+            <Link href="/signin" className="flex items-center space-x-2">
+              <LogIn className="h-4 w-4 text-blue-700" />
+              <span className="text-blue-700 font-medium">Sign In</span>
+            </Link>
+          </Button>
         )}
         
         <Button variant="ghost" size="icon" asChild className="hover:bg-blue-100/50 transition-colors">
