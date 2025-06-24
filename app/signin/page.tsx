@@ -42,21 +42,55 @@ export default function SignInPage() {
     if (!validateForm()) return
 
     setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      toast({
-        title: "Welcome back! 🚿",
-        description: "Successfully signed in. Redirecting to dashboard...",
+    
+    try {
+      const response = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       })
-      router.push("/dashboard")
-    }, 1500)
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "Welcome back! 🚿",
+          description: data.message || "Successfully signed in. Redirecting to dashboard...",
+        })
+        router.push("/dashboard")
+      } else {
+        setErrors({ form: data.error || 'Something went wrong' })
+        toast({
+          title: "Error",
+          description: data.error || 'Failed to sign in',
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error('Signin error:', error)
+      setErrors({ form: 'Network error. Please try again.' })
+      toast({
+        title: "Error",
+        description: 'Network error. Please try again.',
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleInputChange = (field) => (e) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }))
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }))
+    }
+    if (errors.form) {
+      setErrors((prev) => ({ ...prev, form: "" }))
     }
   }
 
@@ -73,6 +107,12 @@ export default function SignInPage() {
 
         <div className="glass-effect rounded-3xl p-8 bubble-shadow">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {errors.form && (
+              <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                <p className="text-sm text-red-600">{errors.form}</p>
+              </div>
+            )}
+
             <div>
               <Label htmlFor="email" className="text-blue-700 font-medium">
                 Email Address

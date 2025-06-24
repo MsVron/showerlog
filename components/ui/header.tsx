@@ -10,7 +10,7 @@ export function Header() {
         <span className="pixel-font text-xl text-blue-800">Shower Thoughts</span>
       </Link>
       <Button variant="ghost" size="icon" asChild className="hover:bg-blue-100/50 transition-colors">
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+        <a href="https://github.com/MsVron/showerthoughts/" target="_blank" rel="noopener noreferrer">
           <Github className="h-5 w-5 text-blue-700" />
         </a>
       </Button>
