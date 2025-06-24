@@ -1,16 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth-utils';
+import { getUserFromToken } from '@/lib/auth-utils';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getCurrentUser();
+    const token = request.cookies.get('token')?.value;
+    
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Unauthorized - No token' },
+        { status: 401 }
+      );
+    }
+
+    const user = await getUserFromToken(token);
     if (!user) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - Invalid token' },
         { status: 401 }
       );
     }

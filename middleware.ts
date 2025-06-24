@@ -5,11 +5,12 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Define route categories
-  const protectedRoutes = ["/dashboard", "/saved"]
+  const protectedRoutes = ["/dashboard", "/saved", "/settings"]
   const publicRoutes = ["/signin", "/signup", "/verify-email", "/reset-password", "/forgot-password"]
 
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route))
+  const isRootRoute = pathname === "/"
 
   // Get token from cookies
   const token = request.cookies.get("token")?.value
@@ -20,6 +21,7 @@ export async function middleware(request: NextRequest) {
   console.log("Token preview:", token ? `${token.substring(0, 20)}...` : "none")
   console.log("Is protected route:", isProtectedRoute)
   console.log("Is public route:", isPublicRoute)
+  console.log("Is root route:", isRootRoute)
 
   // Handle protected routes
   if (isProtectedRoute) {
@@ -29,7 +31,7 @@ export async function middleware(request: NextRequest) {
     }
 
     console.log("🔍 Verifying token...")
-    const decoded = await verifyToken(token) // Now async
+    const decoded = await verifyToken(token)
 
     if (!decoded) {
       console.log("❌ Token verification failed, clearing cookie and redirecting to signin")
@@ -51,15 +53,15 @@ export async function middleware(request: NextRequest) {
     })
   }
 
-  // Handle public routes when user is already authenticated
-  if (isPublicRoute && token) {
-    console.log("🔍 Checking token on public route...")
-    const decoded = await verifyToken(token) // Now async
+  // Handle public routes and root route when user is already authenticated
+  if ((isPublicRoute || isRootRoute) && token) {
+    console.log("🔍 Checking token on public/root route...")
+    const decoded = await verifyToken(token)
     if (decoded) {
-      console.log("✅ Authenticated user accessing public route, redirecting to dashboard")
+      console.log("✅ Authenticated user accessing public/root route, redirecting to dashboard")
       return NextResponse.redirect(new URL("/dashboard", request.url))
     } else {
-      console.log("❌ Invalid token on public route, clearing it")
+      console.log("❌ Invalid token on public/root route, clearing it")
       const response = NextResponse.next()
       response.cookies.delete("token")
       return response

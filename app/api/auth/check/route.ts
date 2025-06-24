@@ -1,9 +1,14 @@
-import { NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { NextRequest, NextResponse } from "next/server"
+import { getUserFromToken } from "@/lib/auth-utils"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const token = request.cookies.get('token')?.value;
+    let user = null;
+    
+    if (token) {
+      user = await getUserFromToken(token);
+    }
 
     return NextResponse.json({
       authenticated: !!user,

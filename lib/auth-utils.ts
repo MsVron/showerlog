@@ -135,23 +135,62 @@ export function generateVerificationToken(): string {
   return uuidv4()
 }
 
+// Keep this function for server components that can access headers
 export async function getCurrentUser() {
   try {
+    console.log("🔍 Auth: Getting current user from headers...")
     const headersList = await headers()
     const userId = headersList.get("user-id")
 
+    console.log("👤 Auth: User ID from headers:", userId)
+
     if (!userId) {
+      console.log("❌ Auth: No user ID in headers")
       return null
     }
 
+    console.log("🔍 Auth: Querying database for user:", userId)
     const user = await sql`
       SELECT id, email, name, email_verified, created_at
       FROM users 
       WHERE id = ${userId}
     `
 
-    return user.length > 0 ? user[0] : null
-  } catch {
+    console.log("📊 Auth: Database query result:", user)
+    const result = user.length > 0 ? user[0] : null
+    console.log("✅ Auth: Returning user:", result)
+
+    return result
+  } catch (error) {
+    console.error("❌ Auth: Error in getCurrentUser:", error)
+    return null
+  }
+}
+
+// New function for API routes that need to get user from token
+export async function getUserFromToken(token: string) {
+  try {
+    console.log("🔍 Auth: Getting user from token...")
+
+    const decoded = await verifyToken(token)
+    if (!decoded) {
+      console.log("❌ Auth: Invalid token")
+      return null
+    }
+
+    console.log("🔍 Auth: Querying database for user:", decoded.userId)
+    const user = await sql`
+      SELECT id, email, name, email_verified, created_at
+      FROM users 
+      WHERE id = ${decoded.userId}
+    `
+
+    const result = user.length > 0 ? user[0] : null
+    console.log("✅ Auth: Returning user from token:", result)
+
+    return result
+  } catch (error) {
+    console.error("❌ Auth: Error in getUserFromToken:", error)
     return null
   }
 }

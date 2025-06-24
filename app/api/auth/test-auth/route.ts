@@ -1,12 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getUserFromToken } from "@/lib/auth-utils"
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const token = request.cookies.get('token')?.value;
+    
+    if (!token) {
+      return NextResponse.json({ authenticated: false, error: "No token" }, { status: 401 })
+    }
+
+    const user = await getUserFromToken(token);
 
     if (!user) {
-      return NextResponse.json({ authenticated: false, error: "Not authenticated" }, { status: 401 })
+      return NextResponse.json({ authenticated: false, error: "Invalid token" }, { status: 401 })
     }
 
     return NextResponse.json({

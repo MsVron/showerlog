@@ -16,8 +16,8 @@ export const WaterButton = forwardRef<HTMLButtonElement, WaterButtonProps>(
 
     const variantClasses = {
       primary: "bg-gradient-to-r from-blue-400 to-cyan-400 hover:from-blue-500 hover:to-cyan-500 text-white",
-      secondary: "glass-effect text-blue-800 hover:bg-white/90",
-      ghost: "text-blue-700 hover:bg-blue-100/50",
+      secondary: "glass-effect text-white hover:bg-white/90 hover:text-blue-800",
+      ghost: "text-white hover:bg-blue-100/50 hover:text-blue-700",
     }
 
     const sizeClasses = {

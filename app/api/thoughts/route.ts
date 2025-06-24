@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth-utils';
+import { getUserFromToken } from '@/lib/auth-utils';
 import { z } from 'zod';
 
 const createThoughtSchema = z.object({
@@ -10,10 +10,19 @@ const createThoughtSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
+    const token = request.cookies.get('token')?.value;
+    
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Unauthorized - No token' },
+        { status: 401 }
+      );
+    }
+
+    const user = await getUserFromToken(token);
     if (!user) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - Invalid token' },
         { status: 401 }
       );
     }
@@ -49,10 +58,19 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
+    const token = request.cookies.get('token')?.value;
+    
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Unauthorized - No token' },
+        { status: 401 }
+      );
+    }
+
+    const user = await getUserFromToken(token);
     if (!user) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - Invalid token' },
         { status: 401 }
       );
     }
