@@ -11,9 +11,12 @@ const forgotPasswordSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  console.log("=== FORGOT PASSWORD API CALLED ===")
   try {
     const body = await request.json();
+    console.log("📧 Request body:", body)
     const { email } = forgotPasswordSchema.parse(body);
+    console.log("✅ Email parsed:", email)
 
     const user = await sql`
       SELECT id, email
