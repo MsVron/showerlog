@@ -8,19 +8,38 @@ import { WaterButton } from "@/components/ui/water-button"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
-import { Lightbulb, Save, Sparkles } from "lucide-react"
+import { Lightbulb, Save, Sparkles, Wifi, WifiOff, Clock } from "lucide-react"
+import { generateSubtasks, getRandomThoughts, checkAIHealth, type Subtask } from "@/lib/ai-service"
+
+interface ExtendedSubtask extends Subtask {
+  completed: boolean;
+}
 
 export default function DashboardPage() {
   const [thought, setThought] = useState("")
-  const [subtasks, setSubtasks] = useState<{id: number, text: string, completed: boolean}[]>([])
+  const [subtasks, setSubtasks] = useState<ExtendedSubtask[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isGettingThought, setIsGettingThought] = useState(false)
+  const [aiOnline, setAiOnline] = useState<boolean | null>(null)
+  const [taskBreakdownData, setTaskBreakdownData] = useState<any>(null)
   const { toast } = useToast()
   const router = useRouter()
 
-  // Authentication is handled by middleware - no need for client-side check
+  useEffect(() => {
+    checkAIStatus()
+  }, [])
 
-  const generateSubtasks = async () => {
+  const checkAIStatus = async () => {
+    try {
+      const isOnline = await checkAIHealth()
+      setAiOnline(isOnline)
+    } catch (error) {
+      setAiOnline(false)
+    }
+  }
+
+  const handleGenerateSubtasks = async () => {
     if (!thought.trim()) {
       toast({
         title: "Empty Thought",
@@ -30,42 +49,97 @@ export default function DashboardPage() {
       return
     }
 
-    setIsGenerating(true)
-    // Simulate API call to generate subtasks
-    setTimeout(() => {
-      const mockSubtasks = [
-        { id: 1, text: `Research more about: ${thought.slice(0, 30)}...`, completed: false },
-        { id: 2, text: "Break down into smaller actionable steps", completed: false },
-        { id: 3, text: "Set a timeline for implementation", completed: false },
-        { id: 4, text: "Identify required resources", completed: false },
-        { id: 5, text: "Create a plan of action", completed: false },
-      ]
-      setSubtasks(mockSubtasks)
-      setIsGenerating(false)
+    if (!aiOnline) {
       toast({
-        title: "Subtasks Generated! ✨",
-        description: "Your thought has been broken down into actionable steps.",
+        title: "AI Offline",
+        description: "The AI service is currently unavailable. Please try again later.",
+        variant: "destructive",
       })
-    }, 2000)
+      return
+    }
+
+    setIsGenerating(true)
+    try {
+      const result = await generateSubtasks(thought)
+      
+      if (result.success && result.data) {
+        const processedSubtasks: ExtendedSubtask[] = result.data.subtasks.map(task => ({
+          ...task,
+          completed: false
+        }))
+        
+        setSubtasks(processedSubtasks)
+        setTaskBreakdownData(result.data)
+        
+        toast({
+          title: "Subtasks Generated!",
+          description: `AI created ${result.data.subtasks.length} actionable steps for your thought.`,
+        })
+      } else {
+        throw new Error(result.error || 'Failed to generate subtasks')
+      }
+    } catch (error) {
+      console.error('Failed to generate subtasks:', error)
+      toast({
+        title: "Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to generate subtasks. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
-  const getRandomThought = () => {
-    const randomThoughts = [
-      "What if we could taste colors?",
-      "Why do we say 'after dark' when it's actually after light?",
-      "If you replace all the parts of a ship, is it still the same ship?",
-      "What if dreams are just loading screens for parallel universes?",
-      "Why do we park in driveways and drive on parkways?",
-      "What if plants are actually farming us, giving us oxygen until we decompose?",
-      "If you're waiting for the waiter, aren't you the waiter?",
-      "What if the hokey pokey really is what it's all about?",
-    ]
-    const randomThought = randomThoughts[Math.floor(Math.random() * randomThoughts.length)]
-    setThought(randomThought)
-    toast({
-      title: "Random Thought Delivered! 💭",
-      description: "Sometimes inspiration comes from unexpected places.",
-    })
+  const handleGetRandomThought = async () => {
+    if (!aiOnline) {
+      toast({
+        title: "AI Offline",
+        description: "The AI service is currently unavailable. Please try again later.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsGettingThought(true)
+    
+    // Clear previous subtasks and data when getting a new thought
+    setSubtasks([])
+    setTaskBreakdownData(null)
+    
+    try {
+      const result = await getRandomThoughts()
+      
+      if (result.success && result.thoughts.length > 0) {
+        const randomThought = result.thoughts[Math.floor(Math.random() * result.thoughts.length)]
+        setThought(randomThought)
+        toast({
+          title: "Random Thought Delivered!",
+          description: "AI-generated inspiration for your next project.",
+        })
+      } else {
+        throw new Error('No thoughts received from AI')
+      }
+    } catch (error) {
+      console.error('Failed to get random thought:', error)
+      
+      const fallbackThoughts = [
+        "What if we could taste colors?",
+        "Why do we say 'after dark' when it's actually after light?",
+        "If you replace all the parts of a ship, is it still the same ship?",
+        "What if dreams are just loading screens for parallel universes?",
+        "Why do we park in driveways and drive on parkways?",
+      ]
+      const fallbackThought = fallbackThoughts[Math.floor(Math.random() * fallbackThoughts.length)]
+      setThought(fallbackThought)
+      
+      toast({
+        title: "Fallback Thought Delivered",
+        description: "AI service unavailable, using backup inspiration.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsGettingThought(false)
+    }
   }
 
   const toggleSubtask = (id: number) => {
@@ -83,14 +157,40 @@ export default function DashboardPage() {
     }
 
     setIsSaving(true)
-    // Simulate API call to save
-    setTimeout(() => {
-      setIsSaving(false)
-      toast({
-        title: "Saved to Collection! 💾",
-        description: "Your thought and subtasks have been saved.",
+    try {
+      const response = await fetch('/api/thoughts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: thought,
+          subtasks: subtasks,
+          ai_data: taskBreakdownData,
+          is_saved: true,
+        }),
       })
-    }, 1000)
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        toast({
+          title: "Saved to Collection!",
+          description: "Your thought and AI-generated subtasks have been saved.",
+        })
+      } else {
+        throw new Error(result.error || 'Failed to save')
+      }
+    } catch (error) {
+      console.error('Failed to save thought:', error)
+      toast({
+        title: "Save Failed",
+        description: error instanceof Error ? error.message : "Failed to save to collection. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -119,28 +219,67 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <WaterButton onClick={generateSubtasks} isLoading={isGenerating} size="lg" className="flex-1">
+            <WaterButton onClick={handleGenerateSubtasks} isLoading={isGenerating} size="lg" className="flex-1">
               <Sparkles className="w-5 h-5 mr-2" />
               Generate Subtasks
             </WaterButton>
 
-            <WaterButton onClick={getRandomThought} variant="secondary" size="lg" className="flex-1">
+            <WaterButton onClick={handleGetRandomThought} isLoading={isGettingThought} variant="secondary" size="lg" className="flex-1">
               <Lightbulb className="w-5 h-5 mr-2" />
               Get Random Thought
             </WaterButton>
           </div>
+
+          {aiOnline !== null && (
+            <div className="mt-4 flex items-center justify-center space-x-2 text-sm">
+              {aiOnline ? (
+                <>
+                  <Wifi className="w-4 h-4 text-green-500" />
+                  <span className="text-green-600">AI Service Online</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="w-4 h-4 text-red-500" />
+                  <span className="text-red-600">AI Service Offline</span>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Generated Subtasks */}
         {subtasks.length > 0 && (
           <div className="glass-effect rounded-3xl p-8 bubble-shadow mb-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="pixel-font text-2xl text-blue-800">Generated Subtasks</h2>
+              <div>
+                <h2 className="pixel-font text-2xl text-blue-800">Generated Subtasks</h2>
+                {taskBreakdownData && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                      {taskBreakdownData.category}
+                    </span>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      taskBreakdownData.priority === 'high' ? 'bg-red-100 text-red-700' :
+                      taskBreakdownData.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-green-100 text-green-700'
+                    }`}>
+                      {taskBreakdownData.priority} priority
+                    </span>
+                  </div>
+                )}
+              </div>
               <WaterButton onClick={saveToCollection} isLoading={isSaving} variant="secondary" size="sm">
                 <Save className="w-4 h-4 mr-2" />
                 Save to Collection
               </WaterButton>
             </div>
+
+            {taskBreakdownData && (
+              <div className="mb-6 p-4 bg-blue-50/30 rounded-xl">
+                <h3 className="font-medium text-blue-800 mb-2">Main Goal:</h3>
+                <p className="text-blue-700">{taskBreakdownData.main_goal}</p>
+              </div>
+            )}
 
             <div className="space-y-4">
               {subtasks.map((task) => (
@@ -154,14 +293,34 @@ export default function DashboardPage() {
                     onCheckedChange={() => toggleSubtask(task.id)}
                     className="mt-1"
                   />
-                  <label
-                    htmlFor={`task-${task.id}`}
-                    className={`flex-1 cursor-pointer ${
-                      task.completed ? "line-through text-blue-500" : "text-blue-800"
-                    }`}
-                  >
-                    {task.text}
-                  </label>
+                  <div className="flex-1">
+                    <label
+                      htmlFor={`task-${task.id}`}
+                      className={`block cursor-pointer font-medium ${
+                        task.completed ? "line-through text-blue-500" : "text-blue-800"
+                      }`}
+                    >
+                      {task.title}
+                    </label>
+                    <p className={`text-sm mt-1 ${
+                      task.completed ? "line-through text-blue-400" : "text-blue-600"
+                    }`}>
+                      {task.description}
+                    </p>
+                    <div className="flex gap-3 mt-2 text-xs">
+                      <span className="flex items-center text-blue-500">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {task.estimated_time}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-xs ${
+                        task.difficulty === 'hard' ? 'bg-red-100 text-red-600' :
+                        task.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-600' :
+                        'bg-green-100 text-green-600'
+                      }`}>
+                        {task.difficulty}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

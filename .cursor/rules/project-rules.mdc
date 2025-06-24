@@ -16,14 +16,7 @@ we want to use a pre-trained model for this. please tell me what the best open s
 technologies: this app must be deployed through v0 and neon/postgre 
 use Next.js and typescript,
 everything must be quick and free 
-im aiming to be done with this in under 4 hours. 
-do you think it's possible?
-give the prompt to give v0 for it to generate the frontend for this for us, tell it all the pages you will need 
+
 make the ui clean, and i hope to use the theme of shower in the background and smth inspired by old old pixeled japanese games, the ui should be soft
 and reserve a button of github on top right to link our open source project 
 
-
-
-
-
-let's start by you giving me the prompt of V0, let's leave the rest for later

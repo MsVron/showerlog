@@ -26,24 +26,27 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(url.searchParams.get('limit') || '10');
     const offset = (page - 1) * limit;
 
+    // Get thoughts that are saved (is_saved = true)
     const savedThoughts = await sql`
-      SELECT t.id, t.content, t.subtasks, t.is_saved, t.created_at, st.saved_at
-      FROM thoughts t
-      JOIN saved_thoughts st ON t.id = st.thought_id
-      WHERE st.user_id = ${user.id}
-      ORDER BY st.saved_at DESC
+      SELECT id, content, subtasks, ai_data, is_saved, created_at
+      FROM thoughts 
+      WHERE user_id = ${user.id} AND is_saved = true
+      ORDER BY created_at DESC
       LIMIT ${limit} OFFSET ${offset}
     `;
 
     const totalCount = await sql`
       SELECT COUNT(*) as count
-      FROM saved_thoughts 
-      WHERE user_id = ${user.id}
+      FROM thoughts 
+      WHERE user_id = ${user.id} AND is_saved = true
     `;
 
     return NextResponse.json({
       success: true,
-      thoughts: savedThoughts,
+      thoughts: savedThoughts.map(thought => ({
+        ...thought,
+        saved_at: thought.created_at // Use created_at as saved_at since they're the same
+      })),
       pagination: {
         page,
         limit,

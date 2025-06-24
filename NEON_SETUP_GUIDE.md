@@ -349,7 +349,39 @@ export async function GET() {
 
 Run your app and visit `http://localhost:3000/api/test-db` to test the connection.
 
-## Step 10: Neon Console Features
+## Step 10: Run Database Migration
+
+After confirming your database connection works, run the migration to create all necessary tables:
+
+### Option A: Using curl (Recommended)
+```bash
+# Start your Next.js app first
+npm run dev
+
+# Then in another terminal, run the migration
+curl -X POST http://localhost:3000/api/migrate-db
+```
+
+### Option B: Using your browser
+1. Start your app: `npm run dev`
+2. Visit: `http://localhost:3000/api/migrate-db` (this will run a GET request, but the endpoint supports POST)
+
+### Option C: Manual SQL execution
+If the migration endpoint doesn't work, you can manually run the SQL from `documentation/database/complete_db.sql`:
+
+1. Open Neon Console → SQL Editor
+2. Copy and paste the contents of `documentation/database/complete_db.sql`
+3. Execute the SQL
+
+### Verify Migration Success
+After running the migration, check that these tables were created:
+- `users` - User accounts and authentication
+- `thoughts` - User thoughts and AI-generated subtasks  
+- `saved_thoughts` - Many-to-many relationship for saved thoughts
+
+You can verify in the Neon Console → Tables section.
+
+## Step 11: Neon Console Features
 
 In your Neon console, you can:
 
@@ -359,7 +391,7 @@ In your Neon console, you can:
 4. **Branching**: Create database branches for development
 5. **Backups**: Automatic point-in-time recovery
 
-## Step 11: Deployment Considerations
+## Step 12: Deployment Considerations
 
 ### For Vercel Deployment:
 1. Add your `DATABASE_URL` to Vercel environment variables

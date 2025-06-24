@@ -3,9 +3,25 @@ import { sql } from '@/lib/db';
 import { getUserFromToken } from '@/lib/auth-utils';
 import { z } from 'zod';
 
+const subtaskSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  description: z.string(),
+  estimated_time: z.string(),
+  difficulty: z.enum(['easy', 'medium', 'hard']),
+  completed: z.boolean().optional().default(false)
+});
+
 const createThoughtSchema = z.object({
   content: z.string().min(1),
-  subtasks: z.array(z.string()).optional().default([]),
+  subtasks: z.array(subtaskSchema).optional().default([]),
+  ai_data: z.object({
+    main_goal: z.string(),
+    category: z.string(),
+    priority: z.enum(['high', 'medium', 'low']),
+    subtasks: z.array(subtaskSchema)
+  }).optional(),
+  is_saved: z.boolean().optional().default(false)
 });
 
 export async function POST(request: NextRequest) {
@@ -28,12 +44,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { content, subtasks } = createThoughtSchema.parse(body);
+    const { content, subtasks, ai_data, is_saved } = createThoughtSchema.parse(body);
 
     const result = await sql`
-      INSERT INTO thoughts (user_id, content, subtasks)
-      VALUES (${user.id}, ${content}, ${JSON.stringify(subtasks)})
-      RETURNING id, content, subtasks, is_saved, created_at
+      INSERT INTO thoughts (user_id, content, subtasks, is_saved, ai_data)
+      VALUES (
+        ${user.id}, 
+        ${content}, 
+        ${JSON.stringify(subtasks)},
+        ${is_saved},
+        ${ai_data ? JSON.stringify(ai_data) : null}
+      )
+      RETURNING id, content, subtasks, is_saved, ai_data, created_at
     `;
 
     return NextResponse.json({
@@ -81,7 +103,7 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     const thoughts = await sql`
-      SELECT id, content, subtasks, is_saved, created_at
+      SELECT id, content, subtasks, is_saved, ai_data, created_at
       FROM thoughts 
       WHERE user_id = ${user.id}
       ORDER BY created_at DESC

@@ -17,6 +17,7 @@ CREATE TABLE thoughts (
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
   subtasks JSONB DEFAULT '[]',
+  ai_data JSONB DEFAULT NULL,
   is_saved BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
