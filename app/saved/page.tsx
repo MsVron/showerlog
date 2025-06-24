@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Trash2, Edit, ArrowLeft } from "lucide-react"
 
 export default function SavedThoughtsPage() {
-  const [savedThoughts, setSavedThoughts] = useState([])
+  const [savedThoughts, setSavedThoughts] = useState<{id: number, thought: string, createdAt: string, subtasks: {id: number, text: string, completed: boolean}[]}[]>([])
   const [isLoading, setIsLoading] = useState(false) // Changed to false
   const { toast } = useToast()
 
@@ -50,7 +50,7 @@ export default function SavedThoughtsPage() {
     setSavedThoughts(mockSavedThoughts)
   }, [])
 
-  const deleteThought = (thoughtId) => {
+  const deleteThought = (thoughtId: number) => {
     setSavedThoughts((prev) => prev.filter((thought) => thought.id !== thoughtId))
     toast({
       title: "Thought Deleted",
@@ -58,7 +58,7 @@ export default function SavedThoughtsPage() {
     })
   }
 
-  const toggleSubtask = (thoughtId, subtaskId) => {
+  const toggleSubtask = (thoughtId: number, subtaskId: number) => {
     setSavedThoughts((prev) =>
       prev.map((thought) =>
         thought.id === thoughtId

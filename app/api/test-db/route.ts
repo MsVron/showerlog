@@ -19,7 +19,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json({ 
       message: 'Database connection error',
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       status: 'error'
     }, { status: 500 });
   }

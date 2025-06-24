@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Please verify your email before signing in" }, { status: 403 })
     }
 
-    // Generate token (now async)
-    const token = await generateToken(userData.id)
+    // Generate token
+    const token = generateToken(userData.id)
     console.log("Generated token for user:", userData.id)
 
     // Create response

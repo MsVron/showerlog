@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Header } from "@/components/ui/header"
 import { WaterButton } from "@/components/ui/water-button"
@@ -11,10 +12,13 @@ import { Lightbulb, Save, Sparkles } from "lucide-react"
 
 export default function DashboardPage() {
   const [thought, setThought] = useState("")
-  const [subtasks, setSubtasks] = useState([])
+  const [subtasks, setSubtasks] = useState<{id: number, text: string, completed: boolean}[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
+
+  // Authentication is handled by middleware - no need for client-side check
 
   const generateSubtasks = async () => {
     if (!thought.trim()) {
@@ -64,7 +68,7 @@ export default function DashboardPage() {
     })
   }
 
-  const toggleSubtask = (id) => {
+  const toggleSubtask = (id: number) => {
     setSubtasks((prev) => prev.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)))
   }
 

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/auth-utils"
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Define route categories
@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     }
 
     console.log("🔍 Verifying token...")
-    const decoded = await verifyToken(token) // Now async
+    const decoded = verifyToken(token)
 
     if (!decoded) {
       console.log("❌ Token verification failed, clearing cookie and redirecting to signin")
@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
   // Handle public routes when user is already authenticated
   if (isPublicRoute && token) {
     console.log("🔍 Checking token on public route...")
-    const decoded = await verifyToken(token) // Now async
+    const decoded = verifyToken(token)
     if (decoded) {
       console.log("✅ Authenticated user accessing public route, redirecting to dashboard")
       return NextResponse.redirect(new URL("/dashboard", request.url))
@@ -71,5 +71,15 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|public/).*)"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|public/).*)",
+  ],
 }
