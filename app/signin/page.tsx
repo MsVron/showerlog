@@ -190,6 +190,12 @@ export default function SignInPage() {
               href="/forgot-password"
               className="text-blue-600 hover:text-blue-800 text-sm underline"
               tabIndex={isLoading ? -1 : 0}
+              onClick={() => {
+                // Set session storage flag to allow access to forgot password page
+                console.log("🔑 Setting forgotPasswordAccess flag in sessionStorage")
+                sessionStorage.setItem('forgotPasswordAccess', 'true')
+                console.log("✅ Flag set:", sessionStorage.getItem('forgotPasswordAccess'))
+              }}
             >
               Forgot your password?
             </Link>

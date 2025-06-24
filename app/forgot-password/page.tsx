@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Header } from "@/components/ui/header"
 import { WaterButton } from "@/components/ui/water-button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +14,37 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState("")
+  const [hasAccess, setHasAccess] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
+
+  useEffect(() => {
+    console.log("=== FORGOT PASSWORD ACCESS CHECK ===")
+    console.log("Document referrer:", document.referrer)
+    console.log("SessionStorage flag:", sessionStorage.getItem('forgotPasswordAccess'))
+    
+    // Check if user came from signin page or has valid session storage flag
+    const hasSessionFlag = sessionStorage.getItem('forgotPasswordAccess') === 'true'
+    const hasValidReferrer = document.referrer.includes('/signin')
+    
+    console.log("Has session flag:", hasSessionFlag)
+    console.log("Has valid referrer:", hasValidReferrer)
+    
+    if (!hasSessionFlag && !hasValidReferrer) {
+      console.log("❌ Access denied - redirecting to signin")
+      toast({
+        title: "Access Denied",
+        description: "Please use the 'Forgot Password' link from the sign in page.",
+        variant: "destructive",
+      })
+      router.push('/signin')
+    } else {
+      console.log("✅ Access granted")
+      setHasAccess(true)
+      // Clear the session storage flag
+      sessionStorage.removeItem('forgotPasswordAccess')
+    }
+  }, [router, toast])
 
   const validateEmail = (email: string) => {
     return /\S+@\S+\.\S+/.test(email)
@@ -83,6 +114,14 @@ export default function ForgotPasswordPage() {
     if (error) {
       setError("")
     }
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 water-drop bg-gradient-to-br from-blue-400 to-cyan-300 animate-float"></div>
+      </div>
+    )
   }
 
   return (
