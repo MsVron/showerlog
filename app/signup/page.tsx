@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+
 import { Header } from "@/components/ui/header"
 import { WaterButton } from "@/components/ui/water-button"
 import { Input } from "@/components/ui/input"
@@ -36,7 +36,6 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const { toast } = useToast()
-  const router = useRouter()
 
   const validateForm = () => {
     const newErrors: Errors = {}
@@ -151,10 +150,10 @@ export default function SignUpPage() {
               </div>
               <h2 className="text-lg sm:text-xl font-semibold text-blue-800">Check Your Email!</h2>
               <p className="text-blue-600 text-sm sm:text-base">
-                We've sent a verification link to your email address. Please click the link to verify your account and complete the signup process.
+                We&apos;ve sent a verification link to your email address. Please click the link to verify your account and complete the signup process.
               </p>
               <p className="text-xs sm:text-sm text-blue-500">
-                Didn't receive the email? Check your spam folder or try signing up again.
+                Didn&apos;t receive the email? Check your spam folder or try signing up again.
               </p>
               <button
                 onClick={() => setIsSuccess(false)}

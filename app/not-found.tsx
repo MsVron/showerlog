@@ -11,7 +11,7 @@ export default function NotFound() {
           <div className="w-32 h-32 mx-auto mb-8 water-drop bg-gradient-to-br from-blue-300 to-cyan-300 opacity-50"></div>
           <h1 className="pixel-font text-4xl text-blue-800 mb-4">404</h1>
           <h2 className="pixel-font text-2xl text-blue-700 mb-4">Page Not Found</h2>
-          <p className="text-blue-600 mb-8">Looks like this thought drifted away. Let's get you back on track!</p>
+          <p className="text-blue-600 mb-8">Looks like this thought drifted away. Let&apos;s get you back on track!</p>
           <Link href="/">
             <WaterButton size="lg">Return Home</WaterButton>
           </Link>

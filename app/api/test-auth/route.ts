@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { hashPassword, generateToken, verifyToken, generateVerificationToken } from '@/lib/auth-utils';
+import { generateToken, verifyToken } from '@/lib/auth-utils';
 import nodemailer from 'nodemailer';
 
 export const runtime = 'nodejs';
@@ -37,7 +37,7 @@ export async function GET() {
   }
 
   try {
-    const transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransporter({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || '587'),
       secure: false,

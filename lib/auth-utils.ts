@@ -4,7 +4,6 @@ import { headers } from "next/headers"
 import { sql } from "@/lib/db"
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d"
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12)
@@ -195,7 +194,7 @@ export async function getUserFromToken(token: string) {
   }
 }
 
-export async function handleAuthError(router: any) {
+export async function handleAuthError(router: { push: (path: string) => void }) {
   try {
     await fetch('/api/auth/logout', { method: 'POST' })
   } catch (error) {

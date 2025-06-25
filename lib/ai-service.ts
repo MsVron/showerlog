@@ -129,7 +129,7 @@ export async function getAIStatus() {
 
     const result = await response.json();
     return { status: 'online', details: result };
-  } catch (error) {
+  } catch {
     return { status: 'offline', details: null };
   }
 } 

@@ -241,4 +241,16 @@ MIT License - feel free to use this project for your own purposes!
 
 ---
 
-**Made with ☕ and 🚿 thoughts** 
+**Made with ☕ and 🚿 thoughts**
+
+## Deployment to Vercel
+
+To deploy the Showerthoughts app to Vercel, follow these steps:
+
+1. **Install Vercel CLI**: If you haven't already, install the Vercel CLI by running `npm install -g vercel`.
+2. **Login to Vercel**: Run `vercel login` in your terminal and follow the prompts to log in to your Vercel account.
+3. **Deploy the App**: Navigate to the root directory of the project and run `vercel deploy`. This will deploy the app to Vercel.
+4. **Set Environment Variables**: After deployment, ensure to set up the necessary environment variables in the Vercel dashboard for database connections and other configurations as outlined in the `.env` file or project settings.
+5. **Access Your App**: Once deployed, Vercel will provide a URL where your app is live. You can also set up a custom domain if desired.
+
+For more detailed information on Vercel deployment, refer to the [Vercel Documentation](https://vercel.com/docs). 

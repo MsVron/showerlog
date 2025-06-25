@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+
 import Link from "next/link"
 import { Header } from "@/components/ui/header"
 import { WaterButton } from "@/components/ui/water-button"
@@ -22,9 +22,8 @@ export default function DashboardPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [isGettingThought, setIsGettingThought] = useState(false)
   const [aiOnline, setAiOnline] = useState<boolean | null>(null)
-  const [taskBreakdownData, setTaskBreakdownData] = useState<any>(null)
+  const [taskBreakdownData, setTaskBreakdownData] = useState<{ subtasks: Subtask[]; priority: string; main_goal: string; category: string } | null>(null)
   const { toast } = useToast()
-  const router = useRouter()
 
   useEffect(() => {
     checkAIStatus()
@@ -34,7 +33,7 @@ export default function DashboardPage() {
     try {
       const isOnline = await checkAIHealth()
       setAiOnline(isOnline)
-    } catch (error) {
+    } catch {
       setAiOnline(false)
     }
   }
@@ -124,7 +123,7 @@ export default function DashboardPage() {
       
       const fallbackThoughts = [
         "What if we could taste colors?",
-        "Why do we say 'after dark' when it's actually after light?",
+        "Why do we say &apos;after dark&apos; when it&apos;s actually after light?",
         "If you replace all the parts of a ship, is it still the same ship?",
         "What if dreams are just loading screens for parallel universes?",
         "Why do we park in driveways and drive on parkways?",
@@ -206,7 +205,7 @@ export default function DashboardPage() {
         <div className="glass-effect rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 bubble-shadow mb-6 sm:mb-8">
           <div className="mb-4 sm:mb-6">
             <label htmlFor="thought" className="block text-blue-700 font-medium mb-2 sm:mb-3 pixel-font text-base sm:text-lg">
-              What's on your mind?
+                              What&apos;s on your mind?
             </label>
             <Textarea
               id="thought"

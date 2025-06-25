@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Header } from "@/components/ui/header"
@@ -8,7 +8,7 @@ import { WaterButton } from "@/components/ui/water-button"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
-import { Lightbulb, Save, Sparkles, Wifi, WifiOff, Clock, LogIn, UserPlus, MessageCircle, AlertTriangle } from "lucide-react"
+import { Lightbulb, Save, Sparkles, Wifi, WifiOff, Clock, LogIn, UserPlus, AlertTriangle } from "lucide-react"
 import { generateSubtasks, getRandomThoughts, checkAIHealth, type Subtask } from "@/lib/ai-service"
 
 interface ExtendedSubtask extends Subtask {
@@ -16,24 +16,20 @@ interface ExtendedSubtask extends Subtask {
 }
 
 export default function HomePage() {
+  const router = useRouter()
+  const { toast } = useToast()
+  const subtasksRef = useRef<HTMLDivElement>(null)
+
   const [thought, setThought] = useState("")
   const [subtasks, setSubtasks] = useState<ExtendedSubtask[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [isGettingThought, setIsGettingThought] = useState(false)
   const [aiOnline, setAiOnline] = useState<boolean | null>(null)
-  const [taskBreakdownData, setTaskBreakdownData] = useState<any>(null)
+  const [taskBreakdownData, setTaskBreakdownData] = useState<{ subtasks: Subtask[]; priority: string; main_goal: string; category: string } | null>(null)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [showThoughtTip, setShowThoughtTip] = useState(false)
-  const { toast } = useToast()
-  const router = useRouter()
-  const subtasksRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    checkAuthAndAI()
-  }, [])
-
-  const checkAuthAndAI = async () => {
+  const checkAuthAndAI = useCallback(async () => {
     try {
       const authResponse = await fetch('/api/auth/check', {
         credentials: 'include'
@@ -42,7 +38,6 @@ export default function HomePage() {
       if (authResponse.ok) {
         const authData = await authResponse.json()
         if (authData.authenticated) {
-          setIsAuthenticated(true)
           router.push('/dashboard')
           return
         }
@@ -54,12 +49,16 @@ export default function HomePage() {
     try {
       const isOnline = await checkAIHealth()
       setAiOnline(isOnline)
-    } catch (error) {
+    } catch {
       setAiOnline(false)
     }
 
     setIsCheckingAuth(false)
-  }
+  }, [router])
+
+  useEffect(() => {
+    checkAuthAndAI()
+  }, [checkAuthAndAI])
 
   const isThoughtTooShort = (text: string) => {
     const trimmed = text.trim()
@@ -165,7 +164,7 @@ export default function HomePage() {
       
       const fallbackThoughts = [
         "What if we could taste colors?",
-        "Why do we say 'after dark' when it's actually after light?",
+        "Why do we say &apos;after dark&apos; when it&apos;s actually after light?",
         "If you replace all the parts of a ship, is it still the same ship?",
         "What if dreams are just loading screens for parallel universes?",
         "Why do we park in driveways and drive on parkways?",
@@ -229,7 +228,7 @@ export default function HomePage() {
         <div className="glass-effect rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 bubble-shadow mb-6 sm:mb-8">
           <div className="mb-4 sm:mb-6">
             <label htmlFor="thought" className="block text-blue-700 font-medium mb-2 sm:mb-3 pixel-font text-base sm:text-lg">
-              What's on your mind?
+                              What&apos;s on your mind?
             </label>
             <Textarea
               id="thought"

@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { getUserFromToken } from '@/lib/auth-utils';
 
+interface Subtask {
+  id: number;
+  title: string;
+  description: string;
+  estimated_time: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  completed: boolean;
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string; subtaskId: string } }
@@ -41,10 +50,10 @@ export async function PATCH(
       );
     }
 
-    const currentSubtasks = thoughtResult[0].subtasks || [];
+    const currentSubtasks: Subtask[] = thoughtResult[0].subtasks || [];
     
     // Update the specific subtask
-    const updatedSubtasks = currentSubtasks.map((subtask: any) => 
+    const updatedSubtasks = currentSubtasks.map((subtask: Subtask) => 
       subtask.id === subtaskId 
         ? { ...subtask, completed }
         : subtask
