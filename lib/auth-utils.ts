@@ -194,3 +194,13 @@ export async function getUserFromToken(token: string) {
     return null
   }
 }
+
+export async function handleAuthError(router: any) {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' })
+  } catch (error) {
+    console.error('Error during logout cleanup:', error)
+  } finally {
+    router.push('/')
+  }
+}

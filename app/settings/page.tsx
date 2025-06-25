@@ -41,12 +41,19 @@ export default function SettingsPage() {
           const userData = await response.json()
           setUser(userData)
           setName(userData.name || "")
+        } else if (response.status === 401) {
+          try {
+            await fetch('/api/auth/logout', { method: 'POST' })
+          } catch (error) {
+            console.error('Error during logout cleanup:', error)
+          }
+          router.push('/')
         } else {
-          router.push('/signin')
+          router.push('/')
         }
       } catch (error) {
         console.error('Failed to fetch user:', error)
-        router.push('/signin')
+        router.push('/')
       } finally {
         setIsLoading(false)
       }

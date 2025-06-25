@@ -30,16 +30,23 @@ export function Header() {
         if (response.ok) {
           const userData = await response.json()
           setUser(userData)
+        } else if (response.status === 401) {
+          setUser(null)
+          const protectedPages = ['/dashboard', '/settings', '/saved']
+          if (protectedPages.includes(pathname)) {
+            router.push('/')
+          }
         }
       } catch (error) {
         console.error('Failed to fetch user:', error)
+        setUser(null)
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchUser()
-  }, [])
+  }, [pathname, router])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)

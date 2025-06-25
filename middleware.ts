@@ -1,5 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/auth-utils"
+import { neon } from '@neondatabase/serverless'
+
+const sql = neon(process.env.DATABASE_URL!)
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -42,6 +45,27 @@ export async function middleware(request: NextRequest) {
 
     console.log("✅ Token verification successful for user:", decoded.userId)
 
+    // Check if user still exists in database
+    try {
+      const user = await sql`
+        SELECT id FROM users WHERE id = ${decoded.userId}
+      `
+      
+      if (user.length === 0) {
+        console.log("❌ User not found in database, clearing token and redirecting to home (guest mode)")
+        const response = NextResponse.redirect(new URL("/", request.url))
+        response.cookies.delete("token")
+        return response
+      }
+      
+      console.log("✅ User exists in database")
+    } catch (error) {
+      console.error("❌ Database error checking user:", error)
+      const response = NextResponse.redirect(new URL("/", request.url))
+      response.cookies.delete("token")
+      return response
+    }
+
     // Add user ID to request headers for server components
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set("user-id", decoded.userId)
@@ -58,8 +82,27 @@ export async function middleware(request: NextRequest) {
     console.log("🔍 Checking token on public/root route...")
     const decoded = await verifyToken(token)
     if (decoded) {
-      console.log("✅ Authenticated user accessing public/root route, redirecting to dashboard")
-      return NextResponse.redirect(new URL("/dashboard", request.url))
+      // Check if user still exists for public route redirects too
+      try {
+        const user = await sql`
+          SELECT id FROM users WHERE id = ${decoded.userId}
+        `
+        
+        if (user.length === 0) {
+          console.log("❌ User not found on public route, clearing token and staying on current page")
+          const response = NextResponse.next()
+          response.cookies.delete("token")
+          return response
+        }
+        
+        console.log("✅ Authenticated user accessing public/root route, redirecting to dashboard")
+        return NextResponse.redirect(new URL("/dashboard", request.url))
+      } catch (error) {
+        console.error("❌ Database error on public route:", error)
+        const response = NextResponse.next()
+        response.cookies.delete("token")
+        return response
+      }
     } else {
       console.log("❌ Invalid token on public/root route, clearing it")
       const response = NextResponse.next()
