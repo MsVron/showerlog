@@ -130,23 +130,23 @@ export default function SignInPage() {
     <div className="min-h-screen">
       <Header />
 
-      <main className="container mx-auto px-4 py-8 max-w-md">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-4 water-drop bg-gradient-to-br from-blue-400 to-cyan-300 animate-float"></div>
-          <h1 className="pixel-font text-3xl text-blue-800 mb-2">Welcome Back</h1>
-          <p className="text-blue-600">Sign in to continue your creative journey</p>
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-md">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 water-drop bg-gradient-to-br from-blue-400 to-cyan-300 animate-float"></div>
+          <h1 className="pixel-font text-2xl sm:text-3xl text-blue-800 mb-2">Welcome Back</h1>
+          <p className="text-blue-600 text-sm sm:text-base">Sign in to continue your creative journey</p>
         </div>
 
-        <div className="glass-effect rounded-3xl p-8 bubble-shadow">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="glass-effect rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 bubble-shadow">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {errors.form && (
               <div className="p-3 rounded-lg bg-red-50 border border-red-200">
-                <p className="text-sm text-red-600">{errors.form}</p>
+                <p className="text-xs sm:text-sm text-red-600">{errors.form}</p>
               </div>
             )}
 
             <div>
-              <Label htmlFor="email" className="text-blue-700 font-medium">
+              <Label htmlFor="email" className="text-blue-700 font-medium text-sm sm:text-base">
                 Email Address
               </Label>
               <Input
@@ -155,16 +155,16 @@ export default function SignInPage() {
                 value={formData.email}
                 onChange={handleInputChange("email")}
                 disabled={isLoading}
-                className={`mt-1 rounded-xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 ${
+                className={`mt-1 rounded-xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 text-sm sm:text-base ${
                   errors.email ? "border-red-300 focus:border-red-400 focus:ring-red-400" : ""
                 }`}
                 placeholder="your@email.com"
               />
-              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+              {errors.email && <p className="mt-1 text-xs sm:text-sm text-red-600">{errors.email}</p>}
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-blue-700 font-medium">
+              <Label htmlFor="password" className="text-blue-700 font-medium text-sm sm:text-base">
                 Password
               </Label>
               <PasswordInput
@@ -172,15 +172,15 @@ export default function SignInPage() {
                 value={formData.password}
                 onChange={handleInputChange("password")}
                 disabled={isLoading}
-                className={`mt-1 rounded-xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 ${
+                className={`mt-1 rounded-xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 text-sm sm:text-base ${
                   errors.password ? "border-red-300 focus:border-red-400 focus:ring-red-400" : ""
                 }`}
                 placeholder="••••••••"
               />
-              {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+              {errors.password && <p className="mt-1 text-xs sm:text-sm text-red-600">{errors.password}</p>}
             </div>
 
-            <WaterButton type="submit" size="lg" isLoading={isLoading} className="w-full" disabled={isLoading}>
+            <WaterButton type="submit" size="lg" isLoading={isLoading} className="w-full text-sm sm:text-base" disabled={isLoading}>
               {isLoading ? "Signing In..." : "Sign In"}
             </WaterButton>
           </form>
@@ -188,10 +188,9 @@ export default function SignInPage() {
           <div className="mt-4 text-center">
             <Link
               href="/forgot-password"
-              className="text-blue-600 hover:text-blue-800 text-sm underline"
+              className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm underline"
               tabIndex={isLoading ? -1 : 0}
               onClick={() => {
-                // Set session storage flag to allow access to forgot password page
                 console.log("🔑 Setting forgotPasswordAccess flag in sessionStorage")
                 sessionStorage.setItem('forgotPasswordAccess', 'true')
                 console.log("✅ Flag set:", sessionStorage.getItem('forgotPasswordAccess'))
@@ -201,15 +200,11 @@ export default function SignInPage() {
             </Link>
           </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-blue-600">
+          <div className="mt-4 sm:mt-6 text-center">
+            <p className="text-blue-600 text-xs sm:text-sm">
               Don't have an account?{" "}
-              <Link
-                href="/signup"
-                className="text-blue-800 hover:text-blue-900 font-medium underline"
-                tabIndex={isLoading ? -1 : 0}
-              >
-                Sign up
+              <Link href="/signup" className="font-medium underline hover:text-blue-800">
+                Sign up here
               </Link>
             </p>
           </div>

@@ -149,10 +149,10 @@ export default function SavedThoughtsPage() {
     return (
       <div className="min-h-screen">
         <Header />
-        <main className="container mx-auto px-4 py-8 max-w-4xl">
-          <div className="text-center py-20">
-            <div className="w-12 h-12 mx-auto mb-4 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
-            <p className="text-blue-600">Loading your saved thoughts...</p>
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-4xl">
+          <div className="text-center py-12 sm:py-20">
+            <div className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-4 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+            <p className="text-blue-600 text-sm sm:text-base">Loading your saved thoughts...</p>
           </div>
         </main>
       </div>
@@ -163,39 +163,39 @@ export default function SavedThoughtsPage() {
     <div className="min-h-screen">
       <Header />
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-4xl">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
           <div>
-            <h1 className="pixel-font text-3xl md:text-4xl text-blue-800 mb-2">My Saved Thoughts</h1>
-            <p className="text-blue-600">Your collection of creative ideas and their action plans</p>
+            <h1 className="pixel-font text-2xl sm:text-3xl md:text-4xl text-blue-800 mb-2">My Saved Thoughts</h1>
+            <p className="text-blue-600 text-sm sm:text-base">Your collection of creative ideas and their action plans</p>
           </div>
 
           <Link href="/dashboard">
-            <WaterButton variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+            <WaterButton variant="ghost" size="sm" className="text-xs sm:text-sm w-full sm:w-auto">
+              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Back to Dashboard
             </WaterButton>
           </Link>
         </div>
 
         {savedThoughts.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 mx-auto mb-6 water-drop bg-gradient-to-br from-blue-300 to-cyan-300 opacity-50"></div>
-            <h2 className="pixel-font text-2xl text-blue-700 mb-4">No Saved Thoughts Yet</h2>
-            <p className="text-blue-600 mb-8">Start creating and saving your thoughts to see them here!</p>
+          <div className="text-center py-12 sm:py-20">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 water-drop bg-gradient-to-br from-blue-300 to-cyan-300 opacity-50"></div>
+            <h2 className="pixel-font text-xl sm:text-2xl text-blue-700 mb-3 sm:mb-4">No Saved Thoughts Yet</h2>
+            <p className="text-blue-600 mb-6 sm:mb-8 text-sm sm:text-base">Start creating and saving your thoughts to see them here!</p>
             <Link href="/dashboard">
-              <WaterButton>Create Your First Thought</WaterButton>
+              <WaterButton className="text-sm sm:text-base">Create Your First Thought</WaterButton>
             </Link>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {savedThoughts.map((savedThought) => (
-              <div key={savedThought.id} className="glass-effect rounded-3xl p-8 bubble-shadow">
-                <div className="flex justify-between items-start mb-6">
+              <div key={savedThought.id} className="glass-effect rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 bubble-shadow">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 sm:mb-6 gap-3">
                   <div className="flex-1">
-                    <h2 className="pixel-font text-xl text-blue-800 mb-2">{savedThought.content}</h2>
+                    <h2 className="pixel-font text-lg sm:text-xl text-blue-800 mb-2">{savedThought.content}</h2>
                     <div className="flex flex-wrap gap-2 mb-2">
-                      <p className="text-sm text-blue-500">
+                      <p className="text-xs sm:text-sm text-blue-500">
                         Saved on {new Date(savedThought.saved_at || savedThought.created_at).toLocaleDateString()}
                       </p>
                       {savedThought.ai_data && (
@@ -215,34 +215,34 @@ export default function SavedThoughtsPage() {
                     </div>
                   </div>
 
-                  <div className="flex space-x-2 ml-4">
-                    <WaterButton variant="ghost" size="sm">
-                      <Edit className="w-4 h-4" />
+                  <div className="flex space-x-2 sm:ml-4">
+                    <WaterButton variant="ghost" size="sm" className="text-xs sm:text-sm">
+                      <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                     </WaterButton>
                     <WaterButton
                       variant="ghost"
                       size="sm"
                       onClick={() => deleteThought(savedThought.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 text-xs sm:text-sm"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                     </WaterButton>
                   </div>
                 </div>
 
                 {savedThought.ai_data && (
-                  <div className="mb-6 p-4 bg-blue-50/30 rounded-xl">
-                    <h3 className="font-medium text-blue-800 mb-2">Main Goal:</h3>
-                    <p className="text-blue-700">{savedThought.ai_data.main_goal}</p>
+                  <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50/30 rounded-xl">
+                    <h3 className="font-medium text-blue-800 mb-2 text-sm sm:text-base">Main Goal:</h3>
+                    <p className="text-blue-700 text-sm sm:text-base">{savedThought.ai_data.main_goal}</p>
                   </div>
                 )}
 
                 <div className="space-y-3">
-                  <h3 className="font-medium text-blue-700 mb-3">Action Items:</h3>
+                  <h3 className="font-medium text-blue-700 mb-3 text-sm sm:text-base">Action Items:</h3>
                   {savedThought.subtasks.map((subtask) => (
                     <div
                       key={subtask.id}
-                      className="flex items-start space-x-3 p-3 rounded-xl bg-blue-50/50 hover:bg-blue-100/50 transition-colors"
+                      className="flex items-start space-x-3 p-3 sm:p-4 rounded-xl bg-blue-50/50 hover:bg-blue-100/50 transition-colors"
                     >
                       <Checkbox
                         id={`saved-task-${subtask.id}`}
@@ -253,18 +253,18 @@ export default function SavedThoughtsPage() {
                       <div className="flex-1">
                         <label
                           htmlFor={`saved-task-${subtask.id}`}
-                          className={`block cursor-pointer font-medium ${
+                          className={`block cursor-pointer font-medium text-sm sm:text-base ${
                             subtask.completed ? "line-through text-blue-500" : "text-blue-800"
                           }`}
                         >
                           {subtask.title}
                         </label>
-                        <p className={`text-sm mt-1 ${
+                        <p className={`text-xs sm:text-sm mt-1 ${
                           subtask.completed ? "line-through text-blue-400" : "text-blue-600"
                         }`}>
                           {subtask.description}
                         </p>
-                        <div className="flex gap-3 mt-2 text-xs">
+                        <div className="flex flex-wrap gap-2 sm:gap-3 mt-2 text-xs">
                           <span className="flex items-center text-blue-500">
                             <Clock className="w-3 h-3 mr-1" />
                             {subtask.estimated_time}
@@ -283,12 +283,12 @@ export default function SavedThoughtsPage() {
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-blue-100">
-                  <div className="flex justify-between items-center text-sm text-blue-600">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-xs sm:text-sm text-blue-600">
                     <span>
                       {savedThought.subtasks.filter((task) => task.completed).length} of {savedThought.subtasks.length}{" "}
                       completed
                     </span>
-                    <div className="w-24 bg-blue-100 rounded-full h-2">
+                    <div className="w-full sm:w-24 bg-blue-100 rounded-full h-2">
                       <div
                         className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                         style={{

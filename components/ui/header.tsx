@@ -77,16 +77,16 @@ export function Header() {
   }
 
   return (
-    <header className="w-full p-4 flex justify-between items-center relative z-10">
-      <Link href="/" className="flex items-center space-x-2">
-        <div className="w-8 h-8 water-drop bg-gradient-to-br from-blue-400 to-cyan-300"></div>
-                    <span className="pixel-font text-xl text-blue-800">ShowerLog</span>
+    <header className="w-full p-3 sm:p-4 flex justify-between items-center relative z-10">
+      <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
+        <div className="w-6 h-6 sm:w-8 sm:h-8 water-drop bg-gradient-to-br from-blue-400 to-cyan-300"></div>
+        <span className="pixel-font text-lg sm:text-xl text-blue-800">ShowerLog</span>
       </Link>
       
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-1 sm:space-x-2">
         {user && (
-          <div className="flex items-center space-x-3 mr-2">
-            <div className="text-right hidden sm:block">
+          <div className="flex items-center space-x-2 sm:space-x-3 mr-1 sm:mr-2">
+            <div className="text-right hidden md:block">
               <div className="text-sm font-medium text-blue-800">
                 {user.name || 'User'}
               </div>
@@ -94,42 +94,47 @@ export function Header() {
                 {user.email}
               </div>
             </div>
+            <div className="text-right hidden sm:block md:hidden">
+              <div className="text-xs font-medium text-blue-800">
+                {user.name || user.email.split('@')[0]}
+              </div>
+            </div>
             <div className="flex items-center space-x-1">
-              <Button variant="ghost" size="icon" asChild className="hover:bg-blue-100/50 transition-colors">
+              <Button variant="ghost" size="icon" asChild className="hover:bg-blue-100/50 transition-colors h-8 w-8 sm:h-10 sm:w-10">
                 <Link href="/settings">
-                  <Settings className="h-4 w-4 text-blue-700" />
+                  <Settings className="h-3 w-3 sm:h-4 sm:w-4 text-blue-700" />
                 </Link>
               </Button>
             </div>
           </div>
         )}
         
-{(() => {
+        {(() => {
           const authPages = ['/signin', '/signup', '/forgot-password', '/reset-password', '/verify-email']
           const isAuthPage = authPages.some(page => pathname.includes(page))
           const shouldShowAuth = !user && !isLoading && !isAuthPage
           
           return shouldShowAuth && (
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" asChild className="hover:bg-blue-100/50 transition-colors">
-                <Link href="/signin" className="flex items-center space-x-2">
-                  <LogIn className="h-4 w-4 text-blue-700" />
-                  <span className="text-blue-700 font-medium">Sign In</span>
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <Button variant="ghost" size="sm" asChild className="hover:bg-blue-100/50 transition-colors px-2 sm:px-3 h-8 sm:h-9">
+                <Link href="/signin" className="flex items-center space-x-1 sm:space-x-2">
+                  <LogIn className="h-3 w-3 sm:h-4 sm:w-4 text-blue-700" />
+                  <span className="text-blue-700 font-medium text-xs sm:text-sm">Sign In</span>
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" asChild className="border-blue-300 hover:bg-blue-50 transition-colors">
-                <Link href="/signup" className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-blue-700" />
-                  <span className="text-blue-700 font-medium">Sign Up</span>
+              <Button variant="outline" size="sm" asChild className="border-blue-300 hover:bg-blue-50 transition-colors px-2 sm:px-3 h-8 sm:h-9">
+                <Link href="/signup" className="flex items-center space-x-1 sm:space-x-2">
+                  <User className="h-3 w-3 sm:h-4 sm:w-4 text-blue-700" />
+                  <span className="text-blue-700 font-medium text-xs sm:text-sm">Sign Up</span>
                 </Link>
               </Button>
             </div>
           )
         })()}
         
-        <Button variant="ghost" size="icon" asChild className="hover:bg-blue-100/50 transition-colors">
+        <Button variant="ghost" size="icon" asChild className="hover:bg-blue-100/50 transition-colors h-8 w-8 sm:h-10 sm:w-10">
           <a href="https://github.com/MsVron/showerlog" target="_blank" rel="noopener noreferrer">
-            <Github className="h-5 w-5 text-blue-700" />
+            <Github className="h-4 w-4 sm:h-5 sm:w-5 text-blue-700" />
           </a>
         </Button>
         
@@ -139,9 +144,9 @@ export function Header() {
             size="icon" 
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="hover:bg-red-100/50 transition-colors"
+            className="hover:bg-red-100/50 transition-colors h-8 w-8 sm:h-10 sm:w-10"
           >
-            <LogOut className="h-4 w-4 text-red-600" />
+            <LogOut className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
           </Button>
         )}
       </div>
