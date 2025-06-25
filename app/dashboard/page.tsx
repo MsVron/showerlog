@@ -214,7 +214,8 @@ export default function DashboardPage() {
               value={thought}
               onChange={(e) => setThought(e.target.value)}
               placeholder="Share your shower thought, random idea, or creative spark..."
-              className="min-h-32 text-lg rounded-2xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 resize-none"
+              className="text-lg rounded-2xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 resize-none"
+              rows={2}
             />
           </div>
 

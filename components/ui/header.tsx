@@ -121,7 +121,7 @@ export function Header() {
         })()}
         
         <Button variant="ghost" size="icon" asChild className="hover:bg-blue-100/50 transition-colors">
-          <a href="https://github.com/MsVron/showerthoughts/" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/MsVron/showerlog" target="_blank" rel="noopener noreferrer">
             <Github className="h-5 w-5 text-blue-700" />
           </a>
         </Button>

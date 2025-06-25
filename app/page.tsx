@@ -236,19 +236,10 @@ export default function HomePage() {
               value={thought}
               onChange={(e) => setThought(e.target.value)}
               placeholder="Share your shower thought, random idea, or creative spark..."
-              className={`min-h-10 sm:min-h-12 text-sm sm:text-lg rounded-xl sm:rounded-2xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 resize-none transition-all duration-200 ${
+              className={`text-sm sm:text-lg rounded-xl sm:rounded-2xl border-blue-200 focus:border-blue-400 focus:ring-blue-400 resize-none transition-all duration-200 ${
                 showThoughtTip ? 'border-amber-300 focus:border-amber-400 focus:ring-amber-400' : ''
               }`}
-              rows={1}
-              style={{ 
-                height: 'auto',
-                minHeight: '2.5rem'
-              }}
-              onInput={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                target.style.height = 'auto';
-                target.style.height = `${Math.max(target.scrollHeight, 40)}px`;
-              }}
+              rows={2}
             />
                           {showThoughtTip && (
                 <div className="fixed top-4 left-4 right-4 z-50 p-3 bg-amber-50/95 backdrop-blur-sm rounded-lg border border-amber-200 shadow-lg sm:relative sm:top-auto sm:left-auto sm:right-auto sm:mt-3 sm:bg-amber-50/80 sm:backdrop-blur-none sm:shadow-none">
