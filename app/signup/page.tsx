@@ -91,7 +91,7 @@ export default function SignUpPage() {
         setIsSuccess(true)
         toast({
           title: "Account Created Successfully! 🎉",
-          description: data.message || "Welcome to Shower Thoughts! Please check your email to verify your account.",
+          description: data.message || "Welcome to ShowerLog! Please check your email to verify your account.",
         })
         setFormData({
           name: "",

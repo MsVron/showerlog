@@ -1,4 +1,4 @@
-# 🚿 Shower Thoughts - AI-Powered Task Breakdown App
+# 🚿 ShowerLog - AI-Powered Task Breakdown App
 
 Transform your random thoughts into actionable plans with AI-powered task breakdown. Built with Next.js, TypeScript, and Google Flan-T5-Large.
 
@@ -18,7 +18,7 @@ Transform your random thoughts into actionable plans with AI-powered task breakd
 
 ```bash
 git clone <your-repo-url>
-cd showerthoughts
+cd showerlog
 npm install
 ```
 
@@ -133,7 +133,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 📁 Project Structure
 
 ```
-showerthoughts/
+showerlog/
 ├── app/                          # Next.js app directory
 │   ├── api/                      # API routes
 │   │   ├── auth/                 # Authentication endpoints

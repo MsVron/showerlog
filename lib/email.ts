@@ -20,10 +20,10 @@ export async function sendVerificationEmail(email: string, token: string) {
     const result = await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: email,
-      subject: 'Verify your email - ShowerThoughts',
+      subject: 'Verify your email - ShowerLog',
       html: `
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-          <h2 style="color: #4A90E2;">Welcome to ShowerThoughts!</h2>
+          <h2 style="color: #4A90E2;">Welcome to ShowerLog!</h2>
           <p>Please click the link below to verify your email address:</p>
           <a href="${verificationUrl}" style="display: inline-block; padding: 12px 24px; background-color: #4A90E2; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">Verify Email</a>
           <p>If the button doesn't work, copy and paste this link into your browser:</p>
@@ -50,7 +50,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     const result = await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: email,
-      subject: 'Reset your password - ShowerThoughts',
+      subject: 'Reset your password - ShowerLog',
       html: `
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
           <h2 style="color: #4A90E2;">Password Reset Request</h2>

@@ -1,7 +1,7 @@
 # Neon PostgreSQL Database Setup Guide
 
 ## Overview
-This guide will walk you through setting up a free PostgreSQL database with Neon for your Next.js showerthoughts application. Neon is a serverless PostgreSQL platform that's perfect for modern web applications.
+This guide will walk you through setting up a free PostgreSQL database with Neon for your Next.js ShowerLog application. Neon is a serverless PostgreSQL platform that's perfect for modern web applications.
 
 ## Why Neon?
 - **Free tier**: Great for development and small applications
@@ -22,8 +22,8 @@ This guide will walk you through setting up a free PostgreSQL database with Neon
 1. After logging in, you'll see the Neon Console
 2. Click "New Project" 
 3. Choose these settings:
-   - **Project name**: `showerthoughts-app`
-   - **Database name**: `showerthoughts` 
+   - **Project name**: `showerlog-app`
+- **Database name**: `showerlog` 
    - **Region**: Choose the region closest to your users (US East is good for global)
    - **PostgreSQL version**: 16 (latest stable)
 
@@ -36,7 +36,7 @@ This guide will walk you through setting up a free PostgreSQL database with Neon
 3. Select "Next.js" from the framework dropdown
 4. Copy the connection string - it looks like:
    ```
-   postgresql://username:password@ep-xxx-xxx.us-east-1.aws.neon.tech/showerthoughts?sslmode=require
+   postgresql://username:password@ep-xxx-xxx.us-east-1.aws.neon.tech/showerlog?sslmode=require
    ```
 
 ## Step 4: Set Up Environment Variables
@@ -75,7 +75,7 @@ npm install -D drizzle-kit
 
 ## Step 6: Database Schema Design
 
-For your showerthoughts app, you'll need these tables:
+For your ShowerLog app, you'll need these tables:
 
 ### Users Table
 ```sql
@@ -456,4 +456,4 @@ const connectionString = `${process.env.DATABASE_URL}?sslmode=require&pgbouncer=
 2. Set up alerts if approaching limits
 3. Consider upgrading to paid plans for production
 
-Your Neon database is now ready for your showerthoughts application! The serverless nature means it will scale automatically and only charge you for what you use. 
+Your Neon database is now ready for your ShowerLog application! The serverless nature means it will scale automatically and only charge you for what you use. 

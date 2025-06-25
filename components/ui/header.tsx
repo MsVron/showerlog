@@ -73,7 +73,7 @@ export function Header() {
     <header className="w-full p-4 flex justify-between items-center relative z-10">
       <Link href="/" className="flex items-center space-x-2">
         <div className="w-8 h-8 water-drop bg-gradient-to-br from-blue-400 to-cyan-300"></div>
-        <span className="pixel-font text-xl text-blue-800">Shower Thoughts</span>
+                    <span className="pixel-font text-xl text-blue-800">ShowerLog</span>
       </Link>
       
       <div className="flex items-center space-x-2">
