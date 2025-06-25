@@ -97,18 +97,26 @@ export function Header() {
           </div>
         )}
         
-        {(() => {
+{(() => {
           const authPages = ['/signin', '/signup', '/forgot-password', '/reset-password', '/verify-email']
           const isAuthPage = authPages.some(page => pathname.includes(page))
-          const shouldShowSignIn = !user && !isLoading && !isAuthPage
+          const shouldShowAuth = !user && !isLoading && !isAuthPage
           
-          return shouldShowSignIn && (
-            <Button variant="ghost" size="sm" asChild className="hover:bg-blue-100/50 transition-colors">
-              <Link href="/signin" className="flex items-center space-x-2">
-                <LogIn className="h-4 w-4 text-blue-700" />
-                <span className="text-blue-700 font-medium">Sign In</span>
-              </Link>
-            </Button>
+          return shouldShowAuth && (
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" asChild className="hover:bg-blue-100/50 transition-colors">
+                <Link href="/signin" className="flex items-center space-x-2">
+                  <LogIn className="h-4 w-4 text-blue-700" />
+                  <span className="text-blue-700 font-medium">Sign In</span>
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild className="border-blue-300 hover:bg-blue-50 transition-colors">
+                <Link href="/signup" className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-blue-700" />
+                  <span className="text-blue-700 font-medium">Sign Up</span>
+                </Link>
+              </Button>
+            </div>
           )
         })()}
         
