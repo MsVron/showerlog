@@ -6,10 +6,10 @@ import Link from "next/link"
 import { Header } from "@/components/ui/header"
 import { WaterButton } from "@/components/ui/water-button"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
+import { NestedSubtaskComponent } from "@/components/ui/nested-subtask"
 import { useToast } from "@/hooks/use-toast"
-import { Lightbulb, Save, Sparkles, Wifi, WifiOff, Clock, LogIn, UserPlus, AlertTriangle } from "lucide-react"
-import { generateSubtasks, getRandomThoughts, checkAIHealth, type Subtask } from "@/lib/ai-service"
+import { Lightbulb, Save, Sparkles, Wifi, WifiOff, Clock, LogIn, UserPlus, AlertTriangle, BarChart3, Layers } from "lucide-react"
+import { generateSmartBreakdown, getRandomThoughts, checkAIHealth, type Subtask, calculateTaskProgress, getTotalEstimatedTime } from "@/lib/ai-service"
 
 interface ExtendedSubtask extends Subtask {
   completed: boolean;
@@ -25,9 +25,18 @@ export default function HomePage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isGettingThought, setIsGettingThought] = useState(false)
   const [aiOnline, setAiOnline] = useState<boolean | null>(null)
-  const [taskBreakdownData, setTaskBreakdownData] = useState<{ subtasks: Subtask[]; priority: string; main_goal: string; category: string } | null>(null)
+  const [taskBreakdownData, setTaskBreakdownData] = useState<{ 
+    subtasks: Subtask[]; 
+    priority: string; 
+    main_goal: string; 
+    category: string;
+    project_type?: string;
+    complexity_score?: number;
+    total_estimated_hours?: number;
+  } | null>(null)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [showThoughtTip, setShowThoughtTip] = useState(false)
+  const [projectComplexity, setProjectComplexity] = useState<'simple' | 'moderate' | 'complex' | 'enterprise'>('moderate')
 
   const checkAuthAndAI = useCallback(async () => {
     try {
@@ -93,20 +102,145 @@ export default function HomePage() {
 
     setIsGenerating(true)
     try {
-      const result = await generateSubtasks(thought)
+      // Detect project type from thought content with comprehensive context mapping
+      const thoughtLower = thought.toLowerCase()
+      let projectType = 'general'
+      
+      // Technology & Development
+      if (thoughtLower.includes('app') || thoughtLower.includes('software') || thoughtLower.includes('website') || thoughtLower.includes('code') || thoughtLower.includes('programming')) {
+        projectType = 'software'
+      } else if (thoughtLower.includes('web') || thoughtLower.includes('frontend') || thoughtLower.includes('backend') || thoughtLower.includes('responsive')) {
+        projectType = 'web'
+      } else if (thoughtLower.includes('mobile') || thoughtLower.includes('ios') || thoughtLower.includes('android') || thoughtLower.includes('react native') || thoughtLower.includes('flutter')) {
+        projectType = 'mobile'
+      } else if (thoughtLower.includes('ai') || thoughtLower.includes('machine learning') || thoughtLower.includes('neural network') || thoughtLower.includes('data science')) {
+        projectType = 'ai'
+      
+      // Business & Finance
+      } else if (thoughtLower.includes('business') || thoughtLower.includes('company') || thoughtLower.includes('enterprise')) {
+        projectType = 'business'
+      } else if (thoughtLower.includes('startup') || thoughtLower.includes('mvp') || thoughtLower.includes('fundraising') || thoughtLower.includes('pitch')) {
+        projectType = 'startup'
+      } else if (thoughtLower.includes('finance') || thoughtLower.includes('budget') || thoughtLower.includes('investment') || thoughtLower.includes('money')) {
+        projectType = 'finance'
+      } else if (thoughtLower.includes('marketing') || thoughtLower.includes('seo') || thoughtLower.includes('social media') || thoughtLower.includes('campaign')) {
+        projectType = 'marketing'
+      
+      // Creative & Arts
+      } else if (thoughtLower.includes('art') || thoughtLower.includes('painting') || thoughtLower.includes('drawing') || thoughtLower.includes('sculpture')) {
+        projectType = 'art'
+      } else if (thoughtLower.includes('music') || thoughtLower.includes('song') || thoughtLower.includes('album') || thoughtLower.includes('recording')) {
+        projectType = 'music'
+      } else if (thoughtLower.includes('photo') || thoughtLower.includes('camera') || thoughtLower.includes('portrait') || thoughtLower.includes('wedding')) {
+        projectType = 'photography'
+      } else if (thoughtLower.includes('video') || thoughtLower.includes('film') || thoughtLower.includes('documentary') || thoughtLower.includes('editing')) {
+        projectType = 'videography'
+      } else if (thoughtLower.includes('design') || thoughtLower.includes('graphic') || thoughtLower.includes('ui') || thoughtLower.includes('ux') || thoughtLower.includes('brand')) {
+        projectType = 'design'
+      } else if (thoughtLower.includes('creative') || thoughtLower.includes('artistic')) {
+        projectType = 'creative'
+      
+      // Health & Wellness
+      } else if (thoughtLower.includes('fitness') || thoughtLower.includes('workout') || thoughtLower.includes('exercise') || thoughtLower.includes('gym')) {
+        projectType = 'fitness'
+      } else if (thoughtLower.includes('nutrition') || thoughtLower.includes('diet') || thoughtLower.includes('meal') || thoughtLower.includes('healthy eating')) {
+        projectType = 'nutrition'
+      } else if (thoughtLower.includes('beauty') || thoughtLower.includes('skincare') || thoughtLower.includes('makeup') || thoughtLower.includes('cosmetic')) {
+        projectType = 'beauty'
+      } else if (thoughtLower.includes('mental health') || thoughtLower.includes('therapy') || thoughtLower.includes('meditation') || thoughtLower.includes('mindfulness')) {
+        projectType = 'mental_health'
+      } else if (thoughtLower.includes('wellness') || thoughtLower.includes('wellbeing') || thoughtLower.includes('self-care')) {
+        projectType = 'wellness'
+      
+      // Education & Learning
+      } else if (thoughtLower.includes('learn') || thoughtLower.includes('study') || thoughtLower.includes('course') || thoughtLower.includes('education')) {
+        projectType = 'learning'
+      } else if (thoughtLower.includes('teach') || thoughtLower.includes('curriculum') || thoughtLower.includes('lesson') || thoughtLower.includes('instructor')) {
+        projectType = 'teaching'
+      } else if (thoughtLower.includes('language') || thoughtLower.includes('spanish') || thoughtLower.includes('french') || thoughtLower.includes('mandarin')) {
+        projectType = 'language'
+      } else if (thoughtLower.includes('research') || thoughtLower.includes('academic') || thoughtLower.includes('thesis') || thoughtLower.includes('study')) {
+        projectType = 'research'
+      
+      // Sports & Recreation
+      } else if (thoughtLower.includes('sport') || thoughtLower.includes('athletic') || thoughtLower.includes('training') || thoughtLower.includes('competition')) {
+        projectType = 'sports'
+      } else if (thoughtLower.includes('dance') || thoughtLower.includes('dancing') || thoughtLower.includes('choreography') || thoughtLower.includes('ballet')) {
+        projectType = 'dancing'
+      } else if (thoughtLower.includes('outdoor') || thoughtLower.includes('hiking') || thoughtLower.includes('camping') || thoughtLower.includes('adventure')) {
+        projectType = 'outdoor'
+      } else if (thoughtLower.includes('travel') || thoughtLower.includes('trip') || thoughtLower.includes('vacation') || thoughtLower.includes('tourism')) {
+        projectType = 'travel'
+      
+      // Personal Development & Relationships
+      } else if (thoughtLower.includes('relationship') || thoughtLower.includes('dating') || thoughtLower.includes('marriage') || thoughtLower.includes('family')) {
+        projectType = 'relationships'
+      } else if (thoughtLower.includes('personal development') || thoughtLower.includes('self-improvement') || thoughtLower.includes('goal') || thoughtLower.includes('habit')) {
+        projectType = 'personal'
+      } else if (thoughtLower.includes('parent') || thoughtLower.includes('child') || thoughtLower.includes('family') || thoughtLower.includes('kids')) {
+        projectType = 'parenting'
+      
+      // Home & Lifestyle
+      } else if (thoughtLower.includes('cook') || thoughtLower.includes('recipe') || thoughtLower.includes('baking') || thoughtLower.includes('culinary')) {
+        projectType = 'cooking'
+      } else if (thoughtLower.includes('garden') || thoughtLower.includes('plant') || thoughtLower.includes('grow') || thoughtLower.includes('organic')) {
+        projectType = 'gardening'
+      } else if (thoughtLower.includes('home') || thoughtLower.includes('house') || thoughtLower.includes('interior') || thoughtLower.includes('renovation')) {
+        projectType = 'home'
+      } else if (thoughtLower.includes('diy') || thoughtLower.includes('craft') || thoughtLower.includes('handmade') || thoughtLower.includes('woodworking')) {
+        projectType = 'diy'
+      
+      // Career & Professional
+      } else if (thoughtLower.includes('career') || thoughtLower.includes('professional') || thoughtLower.includes('job') || thoughtLower.includes('work')) {
+        projectType = 'career'
+      } else if (thoughtLower.includes('resume') || thoughtLower.includes('interview') || thoughtLower.includes('job hunting') || thoughtLower.includes('job search')) {
+        projectType = 'job_hunting'
+      } else if (thoughtLower.includes('freelance') || thoughtLower.includes('consultant') || thoughtLower.includes('independent')) {
+        projectType = 'freelancing'
+      
+      // Science & Environment
+      } else if (thoughtLower.includes('science') || thoughtLower.includes('research') || thoughtLower.includes('experiment') || thoughtLower.includes('laboratory')) {
+        projectType = 'science'
+      } else if (thoughtLower.includes('environment') || thoughtLower.includes('sustainability') || thoughtLower.includes('eco') || thoughtLower.includes('green')) {
+        projectType = 'environment'
+      
+      // Other Categories
+      } else if (thoughtLower.includes('volunteer') || thoughtLower.includes('community service') || thoughtLower.includes('charity')) {
+        projectType = 'volunteer'
+      } else if (thoughtLower.includes('hobby') || thoughtLower.includes('personal interest') || thoughtLower.includes('recreational')) {
+        projectType = 'hobby'
+      }
+
+      console.log('=== CALLING generateSmartBreakdown ===');
+      console.log('thought:', thought);
+      console.log('thought length:', thought.length);
+      console.log('thought trimmed:', thought.trim());
+      console.log('projectType:', projectType);
+      console.log('projectComplexity:', projectComplexity);
+      
+      const result = await generateSmartBreakdown(thought, projectType, projectComplexity)
       
       if (result.success && result.data) {
-        const processedSubtasks: ExtendedSubtask[] = result.data.subtasks.map(task => ({
+        const processedSubtasks: ExtendedSubtask[] = result.data.subtasks.map((task, index) => ({
           ...task,
-          completed: false
+          completed: false,
+          expanded: false,
+          canBreakdown: task.difficulty !== 'easy' && (
+            task.estimated_time.includes('hour') && parseInt(task.estimated_time) > 2 ||
+            task.estimated_time.includes('day') ||
+            task.estimated_time.includes('week')
+          ),
+          depth: 0
         }))
         
         setSubtasks(processedSubtasks)
         setTaskBreakdownData(result.data)
         
+        const totalHours = getTotalEstimatedTime(processedSubtasks)
+        
         toast({
-          title: "Subtasks Generated!",
-          description: `AI created ${result.data.subtasks.length} actionable steps for your thought.`,
+          title: "🚀 Advanced Task Breakdown Complete!",
+          description: `Mistral 7B generated ${result.data.subtasks.length} intelligent subtasks. Estimated: ${totalHours}h total.`,
         })
 
         setTimeout(() => {
@@ -183,7 +317,41 @@ export default function HomePage() {
   }
 
   const toggleSubtask = (id: number) => {
-    setSubtasks((prev) => prev.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)))
+    const updateTaskRecursively = (tasks: ExtendedSubtask[], targetId: number): ExtendedSubtask[] => {
+      return tasks.map(task => {
+        if (task.id === targetId) {
+          return { ...task, completed: !task.completed }
+        }
+        if (task.subtasks) {
+          return {
+            ...task,
+            subtasks: updateTaskRecursively(task.subtasks as ExtendedSubtask[], targetId)
+          }
+        }
+        return task
+      })
+    }
+
+    setSubtasks(prev => updateTaskRecursively(prev, id))
+  }
+
+  const updateTask = (taskId: number, updates: Partial<ExtendedSubtask>) => {
+    const updateTaskRecursively = (tasks: ExtendedSubtask[], targetId: number): ExtendedSubtask[] => {
+      return tasks.map(task => {
+        if (task.id === targetId) {
+          return { ...task, ...updates }
+        }
+        if (task.subtasks) {
+          return {
+            ...task,
+            subtasks: updateTaskRecursively(task.subtasks as ExtendedSubtask[], targetId)
+          }
+        }
+        return task
+      })
+    }
+
+    setSubtasks(prev => updateTaskRecursively(prev, taskId))
   }
 
   const handleSavePrompt = () => {
@@ -262,6 +430,55 @@ export default function HomePage() {
                   </div>
                 </div>
               )}
+          
+            {/* Project Complexity Selector */}
+            <div className="mt-3 sm:mt-4">
+              <label className="block text-blue-600 font-medium mb-2 text-sm">
+                <Layers className="w-4 h-4 inline mr-2" />
+                Project Complexity
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: 'simple', label: 'Simple', desc: 'Quick projects, 1-5 hours', color: 'green' },
+                  { value: 'moderate', label: 'Moderate', desc: 'Medium projects, 1-2 weeks', color: 'yellow' },
+                  { value: 'complex', label: 'Complex', desc: 'Large projects, 1-3 months', color: 'orange' },
+                  { value: 'enterprise', label: 'Enterprise', desc: 'Major initiatives, 3+ months', color: 'red' }
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setProjectComplexity(option.value as any)}
+                    className={`px-3 py-2 rounded-xl text-xs sm:text-sm border transition-all duration-300 pixel-font relative overflow-hidden group ${
+                      projectComplexity === option.value
+                        ? option.color === 'green' 
+                          ? 'bg-emerald-100 border-emerald-300 text-emerald-800 shadow-emerald-200/50' 
+                          : option.color === 'yellow'
+                          ? 'bg-amber-100 border-amber-300 text-amber-800 shadow-amber-200/50'
+                          : option.color === 'orange'
+                          ? 'bg-orange-100 border-orange-300 text-orange-800 shadow-orange-200/50'
+                          : 'bg-red-100 border-red-300 text-red-800 shadow-red-200/50'
+                        : option.color === 'green'
+                        ? 'glass-effect border-emerald-200 text-emerald-700 hover:bg-emerald-50/80'
+                        : option.color === 'yellow'
+                        ? 'glass-effect border-amber-200 text-amber-700 hover:bg-amber-50/80'
+                        : option.color === 'orange'
+                        ? 'glass-effect border-orange-200 text-orange-700 hover:bg-orange-50/80'
+                        : 'glass-effect border-red-200 text-red-700 hover:bg-red-50/80'
+                    } ${projectComplexity === option.value ? 'bubble-shadow' : 'hover:bubble-shadow'}`}
+                    title={option.desc}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        option.color === 'green' ? 'bg-emerald-500' :
+                        option.color === 'yellow' ? 'bg-amber-500' :
+                        option.color === 'orange' ? 'bg-orange-500' :
+                        'bg-red-500'
+                      } ${projectComplexity === option.value ? 'animate-pulse' : ''}`}></div>
+                      <span>{option.label}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -330,36 +547,6 @@ export default function HomePage() {
               </WaterButton>
             </div>
 
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-amber-50/50 rounded-xl border border-amber-200">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 mt-1">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-amber-100 rounded-full flex items-center justify-center">
-                    <Save className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-600" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-amber-800 mb-1 text-sm sm:text-base">Want to save this?</h3>
-                  <p className="text-amber-700 text-xs sm:text-sm mb-3">
-                    Create a free account to save your thoughts and track your progress on subtasks.
-                  </p>
-                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                    <Link href="/signup">
-                      <WaterButton size="sm" className="text-xs w-full sm:w-auto">
-                        <UserPlus className="w-3 h-3 mr-1" />
-                        Sign Up Free
-                      </WaterButton>
-                    </Link>
-                    <Link href="/signin">
-                      <WaterButton size="sm" variant="secondary" className="text-xs w-full sm:w-auto">
-                        <LogIn className="w-3 h-3 mr-1" />
-                        Sign In
-                      </WaterButton>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {taskBreakdownData && (
               <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50/30 rounded-xl">
                 <h3 className="font-medium text-blue-800 mb-2 text-sm sm:text-base">Main Goal:</h3>
@@ -367,47 +554,18 @@ export default function HomePage() {
               </div>
             )}
 
+            {/* Nested Subtask Display */}
             <div className="space-y-3 sm:space-y-4">
               {subtasks.map((task) => (
-                <div
+                <NestedSubtaskComponent
                   key={task.id}
-                  className="flex items-start space-x-3 p-3 sm:p-4 rounded-xl bg-blue-50/50 hover:bg-blue-100/50 transition-colors"
-                >
-                  <Checkbox
-                    id={`task-${task.id}`}
-                    checked={task.completed}
-                    onCheckedChange={() => toggleSubtask(task.id)}
-                    className="mt-1"
-                  />
-                  <div className="flex-1">
-                    <label
-                      htmlFor={`task-${task.id}`}
-                      className={`block cursor-pointer font-medium text-sm sm:text-base ${
-                        task.completed ? "line-through text-blue-500" : "text-blue-800"
-                      }`}
-                    >
-                      {task.title}
-                    </label>
-                    <p className={`text-xs sm:text-sm mt-1 ${
-                      task.completed ? "line-through text-blue-400" : "text-blue-600"
-                    }`}>
-                      {task.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2 sm:gap-3 mt-2 text-xs">
-                      <span className="flex items-center text-blue-500">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {task.estimated_time}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded text-xs ${
-                        task.difficulty === 'hard' ? 'bg-red-100 text-red-600' :
-                        task.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-600' :
-                        'bg-green-100 text-green-600'
-                      }`}>
-                        {task.difficulty}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                  task={task}
+                  depth={0}
+                  maxDepth={4}
+                  onTaskUpdate={updateTask}
+                  onToggleComplete={toggleSubtask}
+                  parentContext={taskBreakdownData?.main_goal || ''}
+                />
               ))}
             </div>
           </div>
