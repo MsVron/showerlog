@@ -115,8 +115,6 @@ export async function generateNestedSubtasks(
   depth?: number
 ): Promise<NestedBreakdownResult> {
   try {
-    console.log(`Calling AI API: ${AI_API_URL}/breakdown-nested`);
-    
     const response = await fetch(`${AI_API_URL}/breakdown-nested`, {
       method: 'POST',
       headers: getHeaders(),
@@ -129,22 +127,19 @@ export async function generateNestedSubtasks(
         },
         context: context || '',
         depth: depth || 1,
-        max_depth: 5 // Prevent infinite recursion
+        max_depth: 5
       }),
       mode: 'cors',
       credentials: 'omit'
     });
 
-    console.log(`Nested Breakdown API Response Status: ${response.status}`);
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Nested Breakdown API Error Response: ${errorText}`);
-      throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
+      console.error('Nested Breakdown API Error');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log('Nested Breakdown API Success:', result);
     return result;
   } catch (error) {
     console.error('Nested Breakdown API Error:', error);
@@ -159,9 +154,6 @@ export async function generateSmartBreakdown(
 ): Promise<AIResponse> {
   try {
     console.log('=== generateSmartBreakdown START ===');
-    console.log('Raw task parameter:', task);
-    console.log('Task type:', typeof task);
-    console.log('Task length:', task ? task.length : 'undefined');
     
     if (!task || task.trim().length === 0) {
       console.error('Task validation failed - empty or undefined');
@@ -169,13 +161,6 @@ export async function generateSmartBreakdown(
     }
 
     const trimmedTask = task.trim();
-    console.log('Trimmed task:', trimmedTask);
-    console.log('Trimmed task length:', trimmedTask.length);
-    
-    console.log(`Calling AI API: ${AI_API_URL}/breakdown-smart`);
-    console.log('AI_API_URL:', AI_API_URL);
-    console.log('Project type:', projectType);
-    console.log('Complexity:', complexity);
     
     const response = await fetch(`${AI_API_URL}/breakdown-smart`, {
       method: 'POST',
@@ -189,16 +174,13 @@ export async function generateSmartBreakdown(
       credentials: 'omit'
     });
 
-    console.log(`Smart Breakdown API Response Status: ${response.status}`);
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Smart Breakdown API Error Response: ${errorText}`);
-      throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
+      console.error('Smart Breakdown API Error');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log('Smart Breakdown API Success:', result);
     return result;
   } catch (error) {
     console.error('Smart Breakdown API Error:', error);
@@ -208,8 +190,6 @@ export async function generateSmartBreakdown(
 
 export async function getRandomThoughts(): Promise<RandomThoughtsResponse> {
   try {
-    console.log(`Calling AI API: ${AI_API_URL}/generate-thoughts`);
-    
     const headers: Record<string, string> = {};
     if (AI_API_URL.includes('ngrok')) {
       headers['ngrok-skip-browser-warning'] = 'true';
@@ -219,17 +199,14 @@ export async function getRandomThoughts(): Promise<RandomThoughtsResponse> {
       method: 'GET',
       headers
     });
-    
-    console.log(`Random Thoughts API Response Status: ${response.status}`);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Random Thoughts API Error Response: ${errorText}`);
-      throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
+      console.error('Random Thoughts API Error');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log('Random Thoughts API Success:', result);
     return result;
   } catch (error) {
     console.error('Random Thoughts API Error:', error);
@@ -254,8 +231,8 @@ export async function checkAIHealth(): Promise<boolean> {
       credentials: 'omit'
     });
     return response.ok;
-  } catch (error) {
-    console.error('AI Health Check Error:', error);
+  } catch {
+    console.error('AI Health Check Error');
     return false;
   }
 }

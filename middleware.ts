@@ -18,32 +18,19 @@ export async function middleware(request: NextRequest) {
   // Get token from cookies
   const token = request.cookies.get("token")?.value
 
-  console.log("=== MIDDLEWARE DEBUG ===")
-  console.log("Pathname:", pathname)
-  console.log("Token exists:", !!token)
-  console.log("Token preview:", token ? `${token.substring(0, 20)}...` : "none")
-  console.log("Is protected route:", isProtectedRoute)
-  console.log("Is public route:", isPublicRoute)
-  console.log("Is root route:", isRootRoute)
-
   // Handle protected routes
   if (isProtectedRoute) {
     if (!token) {
-      console.log("❌ No token found, redirecting to signin")
       return NextResponse.redirect(new URL("/signin", request.url))
     }
 
-    console.log("🔍 Verifying token...")
     const decoded = await verifyToken(token)
 
     if (!decoded) {
-      console.log("❌ Token verification failed, clearing cookie and redirecting to signin")
       const response = NextResponse.redirect(new URL("/signin", request.url))
       response.cookies.delete("token")
       return response
     }
-
-    console.log("✅ Token verification successful for user:", decoded.userId)
 
     // Check if user still exists in database
     try {
@@ -52,15 +39,11 @@ export async function middleware(request: NextRequest) {
       `
       
       if (user.length === 0) {
-        console.log("❌ User not found in database, clearing token and redirecting to home (guest mode)")
         const response = NextResponse.redirect(new URL("/", request.url))
         response.cookies.delete("token")
         return response
       }
-      
-      console.log("✅ User exists in database")
     } catch (error) {
-      console.error("❌ Database error checking user:", error)
       const response = NextResponse.redirect(new URL("/", request.url))
       response.cookies.delete("token")
       return response
@@ -70,16 +53,31 @@ export async function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set("user-id", decoded.userId)
 
-    return NextResponse.next({
+    const response = NextResponse.next({
       request: {
         headers: requestHeaders,
       },
     })
+
+    // Add security headers
+    response.headers.set("X-DNS-Prefetch-Control", "off")
+    response.headers.set("X-Frame-Options", "DENY")
+    response.headers.set("X-Content-Type-Options", "nosniff")
+    response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.set(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains"
+    )
+    response.headers.set(
+      "Permissions-Policy",
+      "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    )
+
+    return response
   }
 
   // Handle public routes and root route when user is already authenticated
   if ((isPublicRoute || isRootRoute) && token) {
-    console.log("🔍 Checking token on public/root route...")
     const decoded = await verifyToken(token)
     if (decoded) {
       // Check if user still exists for public route redirects too
@@ -89,30 +87,41 @@ export async function middleware(request: NextRequest) {
         `
         
         if (user.length === 0) {
-          console.log("❌ User not found on public route, clearing token and staying on current page")
           const response = NextResponse.next()
           response.cookies.delete("token")
           return response
         }
         
-        console.log("✅ Authenticated user accessing public/root route, redirecting to dashboard")
         return NextResponse.redirect(new URL("/dashboard", request.url))
       } catch (error) {
-        console.error("❌ Database error on public route:", error)
         const response = NextResponse.next()
         response.cookies.delete("token")
         return response
       }
     } else {
-      console.log("❌ Invalid token on public/root route, clearing it")
       const response = NextResponse.next()
       response.cookies.delete("token")
       return response
     }
   }
 
-  console.log("➡️ Allowing request to continue")
-  return NextResponse.next()
+  const response = NextResponse.next()
+
+  // Add security headers to all responses
+  response.headers.set("X-DNS-Prefetch-Control", "off")
+  response.headers.set("X-Frame-Options", "DENY")
+  response.headers.set("X-Content-Type-Options", "nosniff")
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
+  response.headers.set(
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains"
+  )
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  )
+
+  return response
 }
 
 export const config = {

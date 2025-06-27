@@ -1,7 +1,11 @@
 import nodemailer from 'nodemailer';
 
+if (!process.env.SMTP_USER || !process.env.SMTP_PASS || !process.env.SMTP_HOST) {
+  throw new Error("SMTP configuration environment variables are required");
+}
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT || '587'),
   secure: false,
   auth: {
@@ -12,12 +16,9 @@ const transporter = nodemailer.createTransport({
 
 export async function sendVerificationEmail(email: string, token: string) {
   try {
-    console.log('Attempting to send verification email to:', email);
-    console.log('SMTP configured with user:', process.env.SMTP_USER);
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${encodeURIComponent(token)}`;
     
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
-    
-    const result = await transporter.sendMail({
+    await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: email,
       subject: 'Verify your email - ShowerLog',
@@ -32,22 +33,16 @@ export async function sendVerificationEmail(email: string, token: string) {
         </div>
       `,
     });
-
-    console.log('Email sent successfully:', result.messageId);
-    return result;
   } catch (error) {
-    console.error('Failed to send verification email:', error);
-    throw new Error(`Failed to send verification email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error('Failed to send verification email');
   }
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   try {
-    console.log('Attempting to send password reset email to:', email);
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${encodeURIComponent(token)}`;
     
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
-    
-    const result = await transporter.sendMail({
+    await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: email,
       subject: 'Reset your password - ShowerLog',
@@ -63,11 +58,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
         </div>
       `,
     });
-
-    console.log('Password reset email sent successfully:', result.messageId);
-    return result;
   } catch (error) {
-    console.error('Failed to send password reset email:', error);
-    throw new Error(`Failed to send password reset email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error('Failed to send password reset email');
   }
 } 
